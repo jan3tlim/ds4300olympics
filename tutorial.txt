@@ -3,7 +3,8 @@ Amelia: I wrote the entirety of the first 3 questions.
 Katie:
 Janet:
 
-Dataset: 
+Dataset from here: https://zenodo.org/records/6803028
+We downloaded 3 CSVs and converted to JSON.
 Our olympics dataset has 4 collections of data
 
 Mongo Query Language Tutorial

@@ -6,6 +6,7 @@ import json
 
 # Create client
 client = MongoClient()
+client.drop_database('olympics')
 
 # Create / connect to database
 db = client['olympics']

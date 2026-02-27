@@ -167,6 +167,7 @@ for r in rows:
     results_collection.append({
         "athlete_id": aid,
         "athlete_name": clean(r["name"]),
+        "sex": clean(r["sex"]),
         "noc": noc,
         "games": games_name,
         "year": to_int(r["year"]),

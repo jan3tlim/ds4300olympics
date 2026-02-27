@@ -74,7 +74,23 @@ Question 3: Which athletes have won the most medals in Olympic history in this d
                 totalMedals: 13
               },
 
-Question 4:
+Question 4: What olympics had the most and least number of athletes?
+
+            MOST:
+            db.games.aggregate([
+                {$project:{_id:0,games:1,athlete_count:{$size:"$athletes"}}},
+                {$sort:{athlete_count:-1}},
+                {$limit:1}])
+
+            [ { games: '2016 Summer Olympics', athlete_count: 7355 } ]
+
+            LEAST:
+            db.games.aggregate([
+                {$project:{_id:0,games:1,athlete_count:{$size:"$athletes"}}},
+                {$sort:{athlete_count:-1}},
+                {$limit:1}])
+
+            [ { games: '1924 Winter Olympics', athlete_count: 160 } ]
 
 Question 5:
 

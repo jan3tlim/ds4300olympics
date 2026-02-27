@@ -12,32 +12,27 @@ from womens_rep_plot_api import WomensRepPlotAPI
 womens_rep_data = WomensRepDataAPI()
 womens_rep_plot = WomensRepPlotAPI()
 
+# AI suggested using tabulate to make the outputs more readable
+from tabulate import tabulate
+
 def main():
 
-    # 
-    #year_data = womens_rep_data.female_athletes_year()
-    #print(year_data[:10])
+    female_athletes_year_data = womens_rep_data.female_athletes_year()
+    print("\nNumber of Female Athletes per Year:")
+    print(tabulate(female_athletes_year_data, headers="keys", tablefmt="pretty"))
 
-    #top_female_events = womens_rep_data.female_athletes_events(top_n=10)
-    #print("Top 10 events:", top_female_events)
+    top_female_events_data = womens_rep_data.female_athletes_events(top_n=10)
+    print("\nTop 10 events with female athletes across per Year:")
+    print(tabulate(top_female_events_data, headers="keys", tablefmt="pretty"))
 
-    #female_athlete_growth = womens_rep_data.female_athlete_event_growth(top_n=10)
-    #print(female_athlete_growth)
+    female_athlete_growth_data = womens_rep_data.female_athlete_event_growth(top_n=10)
+    print("\nTop 10 Events with Largest Female Athlete Growth:")
+    print(tabulate(female_athlete_growth_data, headers="keys", tablefmt="pretty"))
 
-    # Plot
-    #plot_female_athletes_year = womens_rep_plot.plot_female_athletes_year()
-    #plot_female_athletes_seasons = womens_rep_plot.plot_female_athletes_seasons()
-
-    # Q1: Has the overall number of female athletes increased?
+    # Plot all charts to visualize above data
     womens_rep_plot.plot_female_athletes_year()
-
-    # Q2: Summer vs Winter comparison
     womens_rep_plot.plot_female_athletes_seasons()
-
-    # Q3: Events with most female athletes (all time, 2020 Summer, 2022 Winter)
     womens_rep_plot.plot_top_female_events(top_n=10)
-
-    # Q4: Events with most absolute growth
     womens_rep_plot.plot_event_growth_bar(top_n=20)
 
 if __name__ == "__main__":

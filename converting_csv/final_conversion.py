@@ -116,7 +116,7 @@ for r in rows:
             "season": clean(r["season"]),
             "city": clean(r["city"]),
             "events": set(),
-            "athletes": {},
+            "athletes": {},          # { athlete_id -> {name, events: set()} }
             "medal_results": [],
             "_medal_set": set(),
         }
@@ -127,7 +127,12 @@ for r in rows:
 
     if event:
         gd["events"].add(event)
-    gd["athletes"][aid] = clean(r["name"])
+
+    # ── athlete-event linkage ──────────────────────────────────────────
+    if aid not in gd["athletes"]:
+        gd["athletes"][aid] = {"name": clean(r["name"]), "events": set()}
+    if event:
+        gd["athletes"][aid]["events"].add(event)
 
     if medal:
         key = (aid, event, medal)
@@ -143,20 +148,24 @@ for r in rows:
 games_collections = []
 for gd in games.values():
     gd["events"] = sorted(gd["events"])
-    gd["athletes"] = [{"athlete_id": k, "name": v} for k, v in sorted(gd["athletes"].items())]
+    # Serialize athletes dict → list with events as sorted list
+    gd["athletes"] = [
+        {"athlete_id": aid, "name": info["name"], "events": sorted(info["events"])}
+        for aid, info in sorted(gd["athletes"].items())
+    ]
     gd["medal_results"].sort(key=lambda x: (x["event"] or "", x["medal"] or ""))
     del gd["_medal_set"]
     games_collections.append(gd)
 games_collections.sort(key=lambda x: (x["year"] or 0, x["season"] or ""))
 
-# ── 5. RESULTS COLLECTION (NEW) ───────────────────────────────────────────
-result_set = set()  # for deduplication
+# ── 5. RESULTS COLLECTION ─────────────────────────────────────────────────
+result_set = set()
 results_collection = []
 
 for r in rows:
     medal = clean(r["medal"])
     if not medal:
-        continue  # only include rows where a medal was won
+        continue
 
     aid = r["athlete_id"].strip()
     event = clean(r["event"])

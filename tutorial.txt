@@ -9,8 +9,7 @@ Our olympics dataset has 4 collections of data
 
 Mongo Query Language Tutorial
 
-Question 1: What are the total Gold, Silver, and Bronze medal counts for a given country at every olympics?
-            For example, the USA?
+Question 1: What country had the most medals at each olympics?
 
 Question 2: How many years of olympics are in this dataset?
 

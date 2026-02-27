@@ -16,18 +16,19 @@ events = db.events
 athletes = db.athletes
 countries = db.countries
 games = db.games
+results = db.results
 
 # Clear old collections
 events.drop()
 athletes.drop()
 countries.drop()
 games.drop()
+results.drop()
 
 
 # Load JSON file
 with open('olympics.json', 'r', encoding='utf-8') as f:
     data = json.load(f)
-
 
 # Insert each collection
 if 'athletes' in data:
@@ -46,11 +47,13 @@ if 'games' in data:
     games.insert_many(data['games'])
     print("Inserted games:", len(data['games']))
 
+if 'results' in data:
+    results.insert_many(data['results'])
+    print("Inserted results:", len(data['results']))
 
 # Print collections
 print("\nCollections in DB:")
 print(db.list_collection_names())
-
 
 # Print sample of each collection
 print("\nSample athlete:")
@@ -64,3 +67,6 @@ print(countries.find_one())
 
 print("\nSample game:")
 print(games.find_one())
+
+print("\nSample results:")
+print(results.find_one())

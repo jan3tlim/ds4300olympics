@@ -220,7 +220,7 @@ class EventDiversityAPI:
         """
         Horizontal bar chart of top N events by unique athlete participation.
         """
-        data = self.top_events_by_athlete_count(top_n=top_n)
+        data = self.top_events_by_athlete_count()
         # Reversed so that top event is at the top of the chart for aesthetic and readability
         data = list(reversed(data))
 

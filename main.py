@@ -1,4 +1,6 @@
 """
+Olympics Analysis Using MongoDB
+
 Contributions:
 Amelia:
 Katie:

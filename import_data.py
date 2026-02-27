@@ -1,5 +1,10 @@
 """
-Importing our data
+Olympics Analysis Using MongoDB
+
+Contributions:
+Amelia converted the CSV files to JSON and then wrote this file to import the data from
+olympics.json programmatically.
+Katie & Janet reviewed the code.
 """
 from pymongo import MongoClient
 import json

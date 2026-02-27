@@ -1,5 +1,9 @@
 """
+Olympics Analysis Using MongoDB
 Contributions: Amelia wrote the entirety of this API. Katie & Janet reviewed the code.
+
+Women's Representation API:
+    To learn more about how women's representation in
 """
 
 

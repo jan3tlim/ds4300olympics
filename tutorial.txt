@@ -1,8 +1,26 @@
+Contributions:
+Amelia: I wrote the entirety of the first 3 questions.
+Katie:
+Janet:
+
+Dataset: 
+Our olympics dataset has 4 collections of data
+
 Mongo Query Language Tutorial
 
-Question 1:
+Question 1: What are the total Gold, Silver, and Bronze medal counts for a given country at every olympics?
+            For example, the USA?
 
-Question 2:
+Question 2: How many years of olympics are in this dataset?
+
+            db.games.countDocuments({})
+            53
+
+            db.games.aggregate([{$group: {_id: "$season", total: { $sum: 1 }}}])
+            [ { _id: 'Summer', total: 29 }, { _id: 'Winter', total: 24 } ]
+
+            db.games.find({},{ _id: 0, games: 1, year: 1, season: 1 }).sort({ year: 1 })
+
 
 Question 3:
 

@@ -1,3 +1,8 @@
+"""
+Contributions: Amelia wrote the entirety of this API. Katie & Janet reviewed the code.
+"""
+
+
 from pymongo import MongoClient
 import pandas as pd
 import matplotlib.pyplot as plt

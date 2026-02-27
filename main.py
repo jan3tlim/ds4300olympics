@@ -2,8 +2,8 @@
 Olympics Analysis Using MongoDB
 
 Contributions:
-Amelia wrote the code to implement the API she wrote on  WomensRepAPI
-Katie:
+Amelia wrote the code to implement the API she wrote on WomensRepAPI
+Katie wrote the code to implement the API she wrote on EventDiversityAPI
 Janet:
 """
 from womens_rep_data_api import WomensRepDataAPI
@@ -50,9 +50,6 @@ def main():
 
     print("\nTop 20 NOCs by Event Diversity:")
     print(tabulate(event_div.top_nocs_by_event_diversity(top_n=20), headers="keys", tablefmt="pretty"))
-
-    # Plot the top 10 events by athlete count
-    event_div.plot_top_events_by_athlete_count(top_n=10)
 
 if __name__ == "__main__":
     main()

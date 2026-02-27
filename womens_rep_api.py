@@ -75,17 +75,7 @@ class WomensRepAPI:
         plt.tight_layout()
         plt.show()
 
-    def female_athletes_seasons(self):
-        """
-        Returns female athlete counts per year for Summer and Winter.
-        Output: {"Summer": [{year, count}], "Winter": [{year, count}]}
-        """
-        return {
-            "Summer": self.female_athletes_year(season="Summer"),
-            "Winter": self.female_athletes_year(season="Winter"),
-        }
-
-    def female_athletes_event(self, season=None, top_n=None, bottom_n=None):
+    def female_athletes_events(self, season=None, top_n=None, bottom_n=None):
         """
         Returns total number of female athletes per event across all years.
         """
@@ -107,11 +97,10 @@ class WomensRepAPI:
             return results[-bottom_n:]
         return results
 
-    def female_athlete_event_growth(self, top_n=10):
+    def female_athlete_event_growth(self, top_n=None):
         """
-        Returns top N events with the largest increase in female athletes
+        Returns top N events with the largest percentage increase in female athletes
         from their first to most recent Olympic appearance.
-        Output: [{event, first_year, last_year, growth}, ...]
         """
         pipeline = [
             {"$match": {"sex": "F"}},
@@ -133,9 +122,14 @@ class WomensRepAPI:
                 "event": 1,
                 "first_year": "$first.year",
                 "last_year": "$last.year",
-                "growth": {"$subtract": ["$last.count", "$first.count"]},
+                "first_count": "$first.count",
+                "last_count": "$last.count",
+                "growth_pct": {"$multiply": [
+                    {"$divide": [{"$subtract": ["$last.count", "$first.count"]}, "$first.count"]},
+                    100
+                ]},
             }},
-            {"$sort": {"growth": -1}},
+            {"$sort": {"growth_pct": -1}},
             {"$limit": top_n},
         ]
         return list(self.results.aggregate(pipeline))

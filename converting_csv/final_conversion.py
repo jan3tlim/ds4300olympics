@@ -53,15 +53,19 @@ for r in rows:
             "weight_kg": to_float(r["weight"]),
             "nocs": set(),
             "teams": set(),
+            "events": set(),
         }
     athletes[aid]["nocs"].add(r["noc"].strip())
     if clean(r["team"]):
         athletes[aid]["teams"].add(clean(r["team"]))
+    if clean(r["event"]):
+        athletes[aid]["events"].add(clean(r["event"]))
 
 athlete_collection = []
 for a in athletes.values():
     a["nocs"] = sorted(a["nocs"])
     a["teams"] = sorted(a["teams"])
+    a["events"] = sorted(a["events"])
     athlete_collection.append(a)
 athlete_collection.sort(key=lambda x: x["athlete_id"])
 
@@ -185,7 +189,7 @@ output = {
     "countries": country_collection,
     "events": event_collection,
     "games": games_collections,
-    "results": results_collection,  # NEW
+    "results": results_collection,
 }
 
 with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
@@ -196,4 +200,4 @@ print(f"  Athletes:  {len(athlete_collection)}")
 print(f"  Countries: {len(country_collection)}")
 print(f"  Events:    {len(event_collection)}")
 print(f"  Games:     {len(games_collections)}")
-print(f"  Results:   {len(results_collection)}")  # NEW
+print(f"  Results:   {len(results_collection)}")

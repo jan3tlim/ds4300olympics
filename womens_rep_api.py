@@ -11,6 +11,7 @@ Women's Representation API:
     4. What events have seen the most growth in female athletes?
 """
 from pymongo import MongoClient
+import matplotlib.pyplot as plt
 
 
 class WomensRepAPI:
@@ -22,9 +23,7 @@ class WomensRepAPI:
 
     def female_athletes_year(self, season=None):
         """
-        Returns the total number of unique female athletes per year.
-        Optional: filter by season ("Summer" or "Winter").
-        Output: [{year: int, count: int}, ...]
+        Returns the total number of unique female athletes per year (per olympics)
         """
         match = {"sex": "F"}
 
@@ -33,7 +32,8 @@ class WomensRepAPI:
 
         pipeline = [
             {"$match": match},
-            # Count distinct athlete_ids per year to avoid double-counting
+            # AI actually made me aware of thisp:
+            # Need to count distinct athlete_ids per year to avoid double-counting
             # athletes who competed in multiple events the same year
             {"$group": {"_id": {"year": "$year", "athlete_id": "$athlete_id"}}},
             {"$group": {"_id": "$_id.year", "count": {"$sum": 1}}},
@@ -42,9 +42,41 @@ class WomensRepAPI:
         ]
         return list(self.results.aggregate(pipeline))
 
+    def plot_female_athletes_year(self):
+        """Line graph of total female athletes per year (all Olympics)."""
+        data = self.female_athletes_year()
+        years = [d["year"] for d in data]
+        counts = [d["count"] for d in data]
+
+        plt.figure(figsize=(12, 5))
+        plt.plot(years, counts, marker="o", linewidth=2)
+        plt.title("Female Athletes in the Olympics Over Time")
+        plt.xlabel("Year")
+        plt.ylabel("Number of Female Athletes")
+        plt.grid(True)
+        plt.tight_layout()
+        plt.show()
+
+    def plot_female_athletes_seasons(self):
+        """Line graph comparing female athletes per year: Summer vs Winter."""
+        summer = self.female_athletes_year(season="Summer")
+        winter = self.female_athletes_year(season="Winter")
+
+        plt.figure(figsize=(12, 5))
+        plt.plot([d["year"] for d in summer], [d["count"] for d in summer],
+                 marker="o", linewidth=2, label="Summer")
+        plt.plot([d["year"] for d in winter], [d["count"] for d in winter],
+                 marker="o", linewidth=2, label="Winter")
+        plt.title("Female Athletes: Summer vs Winter Olympics")
+        plt.xlabel("Year")
+        plt.ylabel("Number of Female Athletes")
+        plt.legend()
+        plt.grid(True)
+        plt.tight_layout()
+        plt.show()
+
     def female_athletes_seasons(self):
         """
-        LOWK not super helpful ...
         Returns female athlete counts per year for Summer and Winter.
         Output: {"Summer": [{year, count}], "Winter": [{year, count}]}
         """
@@ -53,10 +85,9 @@ class WomensRepAPI:
             "Winter": self.female_athletes_year(season="Winter"),
         }
 
-    def female_athletes_by_event(self, season=None, top_n=None, bottom_n=None):
+    def female_athletes_event(self, season=None, top_n=None, bottom_n=None):
         """
         Returns total number of female athletes per event across all years.
-        Output: [{event: str, count: int}, ...]
         """
         match = {"sex": "F"}
         if season:
@@ -76,7 +107,7 @@ class WomensRepAPI:
             return results[-bottom_n:]
         return results
 
-    def female_athlete_growth_by_event(self, top_n=10):
+    def female_athlete_event_growth(self, top_n=10):
         """
         Returns top N events with the largest increase in female athletes
         from their first to most recent Olympic appearance.

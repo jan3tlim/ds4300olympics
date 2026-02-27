@@ -9,68 +9,50 @@ Katie & Janet reviewed the code.
 from pymongo import MongoClient
 import json
 
-# Create client
-client = MongoClient()
-client.drop_database('olympics')
+def main():
 
-# Create / connect to database
-db = client['olympics']
+    # Create client
+    client = MongoClient()
+    client.drop_database('olympics')
 
-# Initiate collections
-events = db.events
-athletes = db.athletes
-countries = db.countries
-games = db.games
-results = db.results
+    # Create / connect to database
+    db = client['olympics']
 
-# Clear old collections
-events.drop()
-athletes.drop()
-countries.drop()
-games.drop()
-results.drop()
+    # Initiate collections
+    events = db.events
+    athletes = db.athletes
+    countries = db.countries
+    games = db.games
+    results = db.results
 
-# Load JSON file
-with open('olympics.json', 'r', encoding='utf-8') as f:
-    data = json.load(f)
+    # Load JSON file
+    with open('olympics.json', 'r', encoding='utf-8') as f:
+        data = json.load(f)
 
-# Insert each collection
-if 'athletes' in data:
-    athletes.insert_many(data['athletes'])
-    print("Inserted athletes:", len(data['athletes']))
+    # Insert each collection
+    collections = {
+        'athletes': athletes,
+        'events': events,
+        'countries': countries,
+        'games': games,
+        'results': results,
+        }
 
-if 'events' in data:
-    events.insert_many(data['events'])
-    print("Inserted events:", len(data['events']))
+    # Load each collection
+    # Before, I wrote out "if" statements for each collection. AI helped me streamline this
+    for name, collection in collections.items():
+        if name in data:
+            collection.insert_many(data[name])
+            print(f"Inserted {name}: {len(data[name])}")
 
-if 'countries' in data:
-    countries.insert_many(data['countries'])
-    print("Inserted countries:", len(data['countries']))
+    # Print collections in DB to verify
+    print("\nCollections in DB:")
+    print(db.list_collection_names())
 
-if 'games' in data:
-    games.insert_many(data['games'])
-    print("Inserted games:", len(data['games']))
+    # Print a sample document from each collection
+    for name, collection in collections.items():
+        print(f"\nSample {name[:-1]}:")
+        print(collection.find_one())
 
-if 'results' in data:
-    results.insert_many(data['results'])
-    print("Inserted results:", len(data['results']))
-
-# Print sample collections to verify data
-print("\nCollections in DB:")
-print(db.list_collection_names())
-
-# Print sample of each collection
-print("\nSample athlete:")
-print(athletes.find_one())
-
-print("\nSample event:")
-print(events.find_one())
-
-print("\nSample country:")
-print(countries.find_one())
-
-print("\nSample game:")
-print(games.find_one())
-
-print("\nSample results:")
-print(results.find_one())
+if __name__ == "__main__":
+    main()

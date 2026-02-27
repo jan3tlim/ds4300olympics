@@ -1,9 +1,9 @@
 Olympics Analysis Using MongoDB
 
 Contributions:
-Amelia wrote the first 4 questions with the queries and results.
-Katie
-Janet
+Amelia wrote questions 1-4 with queries and results.
+Katie wrote questions 5-7 with queries and results.
+Janet wrote questions 8-10 with queries and results. 
 
 Dataset from here: https://zenodo.org/records/6803028
 We downloaded 3 CSVs and converted to JSON.
@@ -90,12 +90,114 @@ Question 4: What olympics had the most and least number of athletes?
 
             [ { games: '1924 Winter Olympics', athlete_count: 160 } ]
 
-Question 5:
+Question 5: Which athletes have completed in the greatest number of different Olympic events? (top 3)
+	QUERY:
+		db.athletes.aggregate([
+		  { $match: { events: { $exists: true, $type: "array" } } },
+		  { $addFields: { event_count: { $size: "$events" } } },
+		  { $project: {
+		      _id: 0,
+		      athlete_id: 1,
+		      name: 1,
+		      sex: 1,
+		      event_count: 1
+		  }},
+		  { $sort: { event_count: -1 } },
+		  { $limit: 3 }
+		])
 
-Question 6:
+	OUTPUT:
+		[
+		  {
+		    athlete_id: '42673',
+		    name: 'Ioannis Theofilakis',
+		    sex: 'M',
+		    event_count: 30
+		  },
+		  {
+		    athlete_id: '42672',
+		    name: 'Alexandros Theofilakis',
+		    sex: 'M',
+		    event_count: 20
+		  },
+		  {
+		    athlete_id: '41332',
+		    name: 'Paul Van Asbroeck',
+		    sex: 'M',
+		    event_count: 20
+		  }
+		]
 
-Question 7:
+Question 6: Which countries have produced the most medal-winning Olympic athletes? (top 10)
 
+	QUERY:
+		db.results.aggregate([
+		  { $match: { medal: { $ne: null } } },
+
+		  { $group: {
+		      _id: "$noc",
+		      medal_count: { $sum: 1 },
+		      athletes: { $addToSet: "$athlete_id" }
+		  }},
+
+		  { $project: {
+		      _id: 0,
+		      noc: "$_id",
+		      medal_count: 1,
+		      unique_medalists: { $size: "$athletes" }
+		  }},
+
+		  { $sort: { medal_count: -1 } },
+
+		  { $limit: 10 }
+		])
+
+	OUTPUT: 
+		[
+		  { medal_count: 3690, noc: 'USA', unique_medalists: 2197 },
+		  { medal_count: 1374, noc: 'URS', unique_medalists: 794 },
+		  { medal_count: 1243, noc: 'FRA', unique_medalists: 816 },
+		  { medal_count: 1192, noc: 'GBR', unique_medalists: 824 },
+		  { medal_count: 1180, noc: 'GER', unique_medalists: 726 },
+		  { medal_count: 1022, noc: 'ITA', unique_medalists: 580 },
+		  { medal_count: 941, noc: 'SWE', unique_medalists: 594 },
+		  { medal_count: 817, noc: 'CHN', unique_medalists: 483 },
+		  { medal_count: 778, noc: 'RUS', unique_medalists: 469 },
+		  { medal_count: 729, noc: 'NOR', unique_medalists: 348 }
+		]
+
+Question 7: Which events have the greatest number of unique participating athletes?
+
+	QUERY:
+		db.athletes.aggregate([
+		  { $match: { events: { $exists: true, $type: "array" } } },
+		  { $unwind: "$events" },
+		  { $group: {
+		      _id: "$events",
+		      athletes: { $addToSet: "$athlete_id" }
+		  }},
+		  { $project: {
+		      _id: 0,
+		      event: "$_id",
+		      unique_athletes: { $size: "$athletes" }
+		  }},
+		  { $sort: { unique_athletes: -1 } },
+		  { $limit: 10 }
+		])
+
+	OUTPUT:
+		[
+		  { event: 'Individual, Men', unique_athletes: 2861 },
+		  { event: 'Road Race, Individual, Men', unique_athletes: 2542 },
+		  { event: 'Singles, Men', unique_athletes: 2083 },
+		  { event: '1,500 metres, Men', unique_athletes: 1986 },
+		  { event: 'Individual All-Around, Men', unique_athletes: 1933 },
+		  { event: 'Marathon, Men', unique_athletes: 1831 },
+		  { event: 'Singles, Women', unique_athletes: 1802 },
+		  { event: '100 metres, Men', unique_athletes: 1788 },
+		  { event: 'Individual, Open', unique_athletes: 1637 },
+		  { event: '4 × 100 metres Relay, Men', unique_athletes: 1627 }
+		]
 Question 8:
 
 Question 9:

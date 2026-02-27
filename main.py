@@ -14,9 +14,7 @@ womens_rep_plot = WomensRepPlotAPI()
 
 def main():
 
-    """
-    Calls WomensRepAPI() to women's representation in the Olympics over the years and across events
-    """
+    # 
     #year_data = womens_rep_data.female_athletes_year()
     #print(year_data[:10])
 

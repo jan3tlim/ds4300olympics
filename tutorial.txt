@@ -15,10 +15,10 @@ Mongo Query Language Tutorial
 Question 1: What country had the most medals at each olympics?
     QUERY:
            db.results.aggregate([
-            {$group: {_id: { games: "$games", noc: "$noc" },totalMedals: { $sum: 1 }}},
-            {$sort: { "_id.games": 1, totalMedals: -1 } },
-            {$group: {_id: "$_id.games",topCountry: { $first: "$_id.noc" },totalMedals: { $first: "$totalMedals" }}},
-            {$sort: { _id: 1 } }])
+            {$group: {_id: {games: "$games", noc: "$noc" },totalMedals: {$sum: 1 }}},
+            {$sort: {"_id.games": 1, totalMedals: -1 }},
+            {$group: {_id: "$_id.games",topCountry: {$first: "$_id.noc"},totalMedals: {$first: "$totalMedals" }}},
+            {$sort: {_id: 1 } }])
     RESULTS:
          [
           { _id: '1896 Summer Olympics', topCountry: 'GRE', totalMedals: 51 },
@@ -47,30 +47,26 @@ Question 2: How many years of olympics are in this dataset?
 
 Question 3: Which athletes have won the most medals in Olympic history in this dataset?
     QUERY:
-            db.results.aggregate([{
-                $group:{_id:{athlete_id:"$athlete_id",athlete_name:"$athlete_name",noc:"$noc"},totalMedals:{$sum:1}}},
-                {$sort:{totalMedals:-1}},{$limit:10}])
+           db.results.aggregate([
+              {$group: {_id: {athlete_id: "$athlete_id", athlete_name: "$athlete_name", noc: "$noc"}, totalMedals: {$sum: 1}}},
+              {$sort: {totalMedals: -1}},
+              {$limit: 10},
+              {$project: {"_id.athlete_id": 0}}])
     RESULT:
-            [
-              {
-                _id: { athlete_id: '93860', athlete_name: 'Michael Phelps', noc: 'USA' },
-                totalMedals: 28
+          [
+              {_id: { athlete_name: 'Michael Phelps', noc: 'USA' },
+               totalMedals: 28
+               },
+              {_id: { athlete_name: 'Larisa Latynina', noc: 'URS' },
+               totalMedals: 18
               },
-              {
-                _id: { athlete_id: '29198', athlete_name: 'Larisa Latynina', noc: 'URS' },
-                totalMedals: 18
+              {_id: { athlete_name: 'Nikolay Andrianov', noc: 'URS' },
+               totalMedals: 15
               },
+              { _id: { athlete_name: 'Marit Bjørgen', noc: 'NOR' },
+               totalMedals: 15 },
               {
-                _id: { athlete_id: '101008', athlete_name: 'Marit Bjørgen', noc: 'NOR' },
-                totalMedals: 15
-              },
-              {
-                _id: { athlete_id: '31235', athlete_name: 'Nikolay Andrianov', noc: 'URS' },
-                totalMedals: 15
-              },
-              {
-                _id: {
-                  athlete_id: '22677', athlete_name: 'Edoardo Mangiarotti', noc: 'ITA'},
+                _id: { athlete_name: 'Boris Shakhlin', noc: 'URS' },
                 totalMedals: 13
               },
 

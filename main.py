@@ -2,7 +2,7 @@
 Olympics Analysis Using MongoDB
 
 Contributions:
-Amelia:
+Amelia wrote the code to implement the API she wrote on  WomensRepAPI
 Katie:
 Janet:
 """

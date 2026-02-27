@@ -30,7 +30,6 @@ countries.drop()
 games.drop()
 results.drop()
 
-
 # Load JSON file
 with open('olympics.json', 'r', encoding='utf-8') as f:
     data = json.load(f)
@@ -56,7 +55,7 @@ if 'results' in data:
     results.insert_many(data['results'])
     print("Inserted results:", len(data['results']))
 
-# Print collections
+# Print sample collections to verify data
 print("\nCollections in DB:")
 print(db.list_collection_names())
 

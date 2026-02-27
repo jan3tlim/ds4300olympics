@@ -1,3 +1,4 @@
+
 """
 Olympics Analysis Using MongoDB
 Contributions: Katie wrote the entirety of this API. Amelia & Janet reviewed the code.
@@ -5,7 +6,7 @@ Contributions: Katie wrote the entirety of this API. Amelia & Janet reviewed the
 Event Diversity & Specialization API:
     To learn how broadly athletes (and countries) participate across different Olympic events.
 
-    
+
     Questions: (used AI to come up with questions given my topic of event diversity)
     1) Which athletes competed in the most events?
     2) Which events have the most unique athletes?
@@ -15,6 +16,7 @@ Event Diversity & Specialization API:
 
 from typing import List, Dict, Any, Optional
 from pymongo import MongoClient
+import matplotlib.pyplot as plt
 
 
 class EventDiversityAPI:
@@ -24,17 +26,16 @@ class EventDiversityAPI:
         self.db = client[db_name]
         self.athletes = self.db[collection_name]
 
-
     def base_pipeline(
-        self,
-        sex: Optional[str] = None,
-        noc: Optional[str] = None,
-        min_birth_year: Optional[int] = None,
-        max_birth_year: Optional[int] = None,
+            self,
+            sex: Optional[str] = None,
+            noc: Optional[str] = None,
+            min_birth_year: Optional[int] = None,
+            max_birth_year: Optional[int] = None,
     ) -> List[Dict[str, Any]]:
         """
         Took advice from Amelia and created a base_pipeline function for simplification
-        Shared pipeline: optional $match on sex → optional $match on NOC (via nocs array) → 
+        Shared pipeline: optional $match on sex → optional $match on NOC (via nocs array) →
           optional birth year range filter → return filtered athlete documents
 
         Parameters:
@@ -54,9 +55,9 @@ class EventDiversityAPI:
 
         # If noc is provided, match documents where the nocs array contains said value
         if noc is not None:
-            match["nocs"] = noc 
+            match["nocs"] = noc
 
-        # Birth year filters (only add if provided)
+            # Birth year filters (only add if provided)
         if min_birth_year is not None or max_birth_year is not None:
             birth_year_filter: Dict[str, Any] = {}
             if min_birth_year is not None:
@@ -71,14 +72,11 @@ class EventDiversityAPI:
 
         return pipeline
 
-    # -------------------------
-    # Q1) Athletes with most events
-    # -------------------------
     def top_athletes_by_event_count(
-        self,
-        top_n: int = 20,
-        sex: Optional[str] = None,
-        noc: Optional[str] = None
+            self,
+            top_n: int = 20,
+            sex: Optional[str] = None,
+            noc: Optional[str] = None
     ) -> List[Dict[str, Any]]:
         """
         Returns the athletes who participated in the most events.
@@ -112,14 +110,11 @@ class EventDiversityAPI:
 
         return list(self.athletes.aggregate(pipeline))
 
-    # -------------------------
-    # Q2) Events with most unique athletes
-    # -------------------------
     def top_events_by_athlete_count(
-        self,
-        top_n: int = 20,
-        sex: Optional[str] = None,
-        noc: Optional[str] = None
+            self,
+            top_n: int = 20,
+            sex: Optional[str] = None,
+            noc: Optional[str] = None
     ) -> List[Dict[str, Any]]:
         """
         Returns events that show up for the most unique athletes.
@@ -153,9 +148,6 @@ class EventDiversityAPI:
 
         return list(self.athletes.aggregate(pipeline))
 
-    # -------------------------
-    # Q3) Avg events per athlete by sex
-    # -------------------------
     def avg_event_count_by_sex(self) -> List[Dict[str, Any]]:
         """
         Compares men vs women: average number of events per athlete.
@@ -190,9 +182,6 @@ class EventDiversityAPI:
 
         return list(self.athletes.aggregate(pipeline))
 
-    # -------------------------
-    # Q4) Countries (NOCS) with broadest event participation
-    # -------------------------
     def top_nocs_by_event_diversity(self, top_n: int = 20) -> List[Dict[str, Any]]:
         """
         Returns NOCs (countries) ranked by how many distinct events their athletes participated in.
@@ -227,12 +216,21 @@ class EventDiversityAPI:
 
         return list(self.athletes.aggregate(pipeline))
 
+    def plot_top_events_by_athlete_count(self, top_n: int = 10) -> None:
+        """
+        Horizontal bar chart of top N events by unique athlete participation.
+        """
+        data = self.top_events_by_athlete_count(top_n=top_n)
+        # Reversed so that top event is at the top of the chart for aesthetic and readability
+        data = list(reversed(data))
 
-# Example usage (optional)
-if __name__ == "__main__":
-    api = EventDiversityAPI(db_name="olympics_db", collection_name="athletes")
+        events = [d["event"] for d in data]
+        counts = [d["unique_athletes"] for d in data]
 
-    print(api.top_athletes_by_event_count(top_n=5))
-    print(api.top_events_by_athlete_count(top_n=5))
-    print(api.avg_event_count_by_sex())
-    print(api.top_nocs_by_event_diversity(top_n=10))
+        plt.figure(figsize=(10, 6))
+        plt.barh(events, counts, color="indigo")
+        plt.title(f"Top {top_n} Events by Unique Athlete Participation")
+        plt.xlabel("Number of Unique Athletes")
+        plt.ylabel("Event")
+        plt.tight_layout()
+        plt.show()

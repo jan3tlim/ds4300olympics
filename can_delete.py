@@ -6,7 +6,7 @@ Visualizing Event Diversity API! Visualizes question 2 (Which events have the mo
 """
 
 import matplotlib.pyplot as plt
-from katie_api import EventDiversityAPI
+from event_div_api import EventDiversityAPI
 
 
 def main():

@@ -4,7 +4,8 @@ Olympics Analysis Using MongoDB
 Contributions:
 Amelia wrote the code to implement the API she wrote on WomensRepAPI
 Katie wrote the code to implement the API she wrote on EventDiversityAPI
-Janet:
+Janet wrote the code to implement the API she wrote on ChinaRiseAPI
+
 """
 from womens_rep_data_api import WomensRepDataAPI
 from womens_rep_plot_api import WomensRepPlotAPI

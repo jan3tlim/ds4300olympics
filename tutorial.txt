@@ -198,8 +198,103 @@ Question 7: Which events have the greatest number of unique participating athlet
 		  { event: 'Individual, Open', unique_athletes: 1637 },
 		  { event: '4 × 100 metres Relay, Men', unique_athletes: 1627 }
 		]
-Question 8:
+Question 8: Which continents have the most countries competing?
+    QUERY:
+        olympics> db.results.aggregate([
+        |   { $lookup: {
+        |       from: "countries",
+        |       localField: "noc",
+        |       foreignField: "noc",
+        |       as: "country_info"
+        |   }},
+        |   { $unwind: "$country_info" },
+        |   { $group: {
+        |       _id: "$country_info.continent",
+        |       competing_countries: { $addToSet: "$noc" }
+        |   }},
+        |   { $project: {
+        |       continent: "$_id",
+        |       num_countries: { $size: "$competing_countries" },
+        |       _id: 0
+        |   }},
+        |   { $sort: { num_countries: -1 } }
+        | ])
+    OUTPUT:
+        [
+        { continent: 'EU', num_countries: 40 },
+        { continent: 'AS', num_countries: 35 },
+        { continent: 'AF', num_countries: 28 },
+        { continent: null, num_countries: 18 },
+        { continent: 'SA', num_countries: 10 },
+        { continent: 'OC', num_countries: 4 }
+        ]
+    Note: The 18 countries with null continent are North/Central American 
+    and Caribbean nations (including USA, Canada, Cuba, etc.). The dataset 
+    is missing a continent code for those regions. 
 
-Question 9:
-
-Question 10:
+Question 9: How has the number of participating nations grown over time?
+    QUERY:   
+        db.results.aggregate([
+        { $group: { 
+            _id: { year: "$year", season: "$season" }, 
+            nations: { $addToSet: "$noc" } 
+        }},
+        { $project: { 
+            year: "$_id.year", 
+            season: "$_id.season", 
+            num_nations: { $size: "$nations" }, 
+            _id: 0 
+        }},
+        { $sort: { year: 1 } },
+        { $limit: 15 }
+        ])
+    OUTPUT:
+        [
+        { year: 1896, season: 'Summer', num_nations: 10 },
+        { year: 1900, season: 'Summer', num_nations: 17 },
+        { year: 1904, season: 'Summer', num_nations: 9 },
+        { year: 1908, season: 'Summer', num_nations: 18 },
+        { year: 1912, season: 'Summer', num_nations: 18 },
+        { year: 1920, season: 'Summer', num_nations: 23 },
+        { year: 1924, season: 'Winter', num_nations: 8 },
+        { year: 1924, season: 'Summer', num_nations: 29 },
+        { year: 1928, season: 'Summer', num_nations: 32 },
+        { year: 1928, season: 'Winter', num_nations: 10 },
+        { year: 1932, season: 'Winter', num_nations: 8 },
+        { year: 1932, season: 'Summer', num_nations: 26 },
+        { year: 1936, season: 'Summer', num_nations: 31 },
+        { year: 1936, season: 'Winter', num_nations: 9 },
+        { year: 1948, season: 'Winter', num_nations: 12 }
+        ]
+Question 10: How do former Soviet states perform individually compared to the USSR's total?
+    QUERY:   
+        db.results.aggregate([
+        { $match: { 
+            noc: { $in: ["URS", "RUS", "UKR", "BLR", "KAZ", "UZB", "GEO", "ARM", "AZE", "LTU", "LAT", "EST", "MDA", "KGZ", "TJK", "TKM"] } 
+        }},
+        { $group: { 
+            _id: "$noc", 
+            total_medals: { $sum: 1 },
+            golds: { $sum: { $cond: [{ $eq: ["$medal", "Gold"] }, 1, 0] } }
+        }},
+        { $sort: { total_medals: -1 } }
+        ])
+    OUTPUT:
+        [
+        { _id: 'URS', total_medals: 1374, golds: 564 },
+        { _id: 'RUS', total_medals: 778, golds: 260 },
+        { _id: 'UKR', total_medals: 190, golds: 47 },
+        { _id: 'BLR', total_medals: 137, golds: 43 },
+        { _id: 'KAZ', total_medals: 88, golds: 17 },
+        { _id: 'AZE', total_medals: 57, golds: 9 },
+        { _id: 'EST', total_medals: 51, golds: 20 },
+        { _id: 'GEO', total_medals: 45, golds: 11 },
+        { _id: 'UZB', total_medals: 38, golds: 12 },
+        { _id: 'LTU', total_medals: 29, golds: 8 },
+        { _id: 'LAT', total_medals: 28, golds: 5 },
+        { _id: 'ARM', total_medals: 25, golds: 5 },
+        { _id: 'KGZ', total_medals: 9, golds: 0 },
+        { _id: 'MDA', total_medals: 5, golds: 0 },
+        { _id: 'TJK', total_medals: 4, golds: 1 },
+        { _id: 'TKM', total_medals: 2, golds: 0 }
+        ]

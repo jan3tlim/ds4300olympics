@@ -10,9 +10,18 @@ Janet wrote the code to implement the API she wrote on ChinaRiseAPI
 from womens_rep_data_api import WomensRepDataAPI
 from womens_rep_plot_api import WomensRepPlotAPI
 from event_div_api import EventDiversityAPI
+from china_rise_api import (
+    get_china_medals,
+    get_china_top_sports,
+    get_china_medal_trends,
+    compare_china_vs
+)
+from china_visualization import plot_china_sport_breakdown
+
 event_div = EventDiversityAPI()
 womens_rep_data = WomensRepDataAPI()
 womens_rep_plot = WomensRepPlotAPI()
+
 
 # AI suggested using tabulate to make the outputs more readable
 from tabulate import tabulate
@@ -51,6 +60,46 @@ def main():
 
     print("\nTop 20 NOCs by Event Diversity:")
     print(tabulate(event_div.top_nocs_by_event_diversity(top_n=20), headers="keys", tablefmt="pretty"))
+
+    # Display data to explore China's rise as an Olympic superpower
+    print("\n=== China Overall Medal Summary ===")
+    result = get_china_medals()
+    summary_data = [{"Total Medals": result["total_medals"], **result["breakdown"]}]
+    print(tabulate(summary_data, headers="keys", tablefmt="pretty"))
+
+    print("\nChina's Top 5 Events (Overall):")
+    print(tabulate(result["top_events"], headers="keys", tablefmt="pretty"))
+
+    print("\nChina's Gold Medals in Diving:")
+    diving_result = get_china_medals(medal_type="Gold", sport="Diving")
+    print(f"Total: {diving_result['total_medals']}")
+    print(tabulate(diving_result["top_events"], headers="keys", tablefmt="pretty"))
+
+    print("\nChina's Top 10 Sports:")
+    top_sports_data = [
+        {"Sport": s["_id"], "Total": s["total"], "Gold": s["gold"],
+         "Silver": s["silver"], "Bronze": s["bronze"]}
+        for s in get_china_top_sports()
+    ]
+    print(tabulate(top_sports_data, headers="keys", tablefmt="pretty"))
+
+    print("\nChina Medal Trends Over Time:")
+    trends_data = [
+        {"Year": t["year"], "Season": t["season"], "Medals": t["medals"]}
+        for t in get_china_medal_trends()
+    ]
+    print(tabulate(trends_data, headers="keys", tablefmt="pretty"))
+
+    print("\nChina vs USA, GBR, JPN:")
+    comparison_data = [
+        {"Country": c["_id"], "Total": c["total"], "Gold": c["gold"],
+         "Silver": c["silver"], "Bronze": c["bronze"]}
+        for c in compare_china_vs(["USA", "GBR", "JPN"])
+    ]
+    print(tabulate(comparison_data, headers="keys", tablefmt="pretty"))
+
+    # Plot China's sport breakdown visualization
+    plot_china_sport_breakdown()
 
 if __name__ == "__main__":
     main()

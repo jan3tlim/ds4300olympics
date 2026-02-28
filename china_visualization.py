@@ -84,16 +84,16 @@ def plot_china_sport_breakdown():
                     fontsize=10, fontweight="bold")
 
     ax.set_title("China's Olympic Medal Breakdown by Sport\n"
-                 "Summer Games (1984–2024)",
+                 "Summer Games (1984–2020)",
                  fontsize=15, fontweight="bold")
     ax.set_xlabel("Year", fontsize=12)
     ax.set_ylabel("Total Medals Won", fontsize=12)
     ax.legend(loc="upper left", fontsize=10, framealpha=0.9)
     ax.grid(True, alpha=0.3)
     plt.tight_layout()
-    plt.savefig("report/china_sport_breakdown.png", dpi=150)
+    plt.savefig("china_sport_breakdown.png", dpi=150)
     plt.show()
-    print("Saved to report/china_sport_breakdown.png")
+    print("Saved china_sport_breakdown.png")
 
 
 if __name__ == "__main__":
